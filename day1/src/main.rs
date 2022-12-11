@@ -49,6 +49,8 @@ fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>> wher
     Ok(io::BufReader::new(file).lines())
 }
 
+// TODO:  This is kind of silly to hold the individual items as a vector, but models the problem
+// more closely.  Could just add each item to a running total to simplify vector sums...
 struct Elf {
     id: isize,
     food: Vec<isize>
