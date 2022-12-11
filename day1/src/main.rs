@@ -11,12 +11,25 @@ fn main() {
         exit(1);
     }
 
-    let elves = read_elves(&args[1]);
+    let mut elves = read_elves(&args[1]);
     if let Some(fattest) = elves.iter().max_by_key(|e| e.total()) {
-        println!("Fattest Elf:  {} - {} Calories", fattest.id(), fattest.total());
+        println!("Fattest Elf:  {} - {} Calories", fattest.id, fattest.total());
     } else {
         println!("No elves found...");
     }
+
+    // Kind of dumb - sorts, then reverses to get descending
+    elves.sort_by_key(|e| e.total());
+    elves.reverse();
+    let top3 = elves.iter().take(3);
+
+    println!("Top 3 Elves:");
+    for elf in top3.clone() {
+        println!("{}:  {} Cals", elf.id, elf.total())
+    }
+
+    let top_cals: isize = top3.map(|e| e.total()).sum();
+    println!("Total Calories:  {}", top_cals);
 }
 
 fn read_elves(file_name: &String) -> Vec<Elf> {
@@ -27,11 +40,11 @@ fn read_elves(file_name: &String) -> Vec<Elf> {
         for line in lines {
             match line.unwrap().as_str() {
                 "" => {
-                    let new_id = current_elf.id() + 1;
+                    let new_id = current_elf.id + 1;
                     elves.push(current_elf);
                     current_elf = Elf::new(new_id);
                 }
-                cals=> {
+                cals => {
                     let calories: isize = cals.to_string().parse().unwrap();
                     current_elf.add_calories(calories)
                 }
@@ -59,10 +72,6 @@ struct Elf {
 impl Elf {
     fn new(id: isize) -> Elf {
         Elf{id, food: Vec::new()}
-    }
-
-    fn id(&self) -> isize {
-        self.id
     }
 
     fn add_calories(&mut self, calories: isize) {
