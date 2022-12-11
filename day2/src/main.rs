@@ -43,13 +43,23 @@ fn score_line(line: &str) -> isize {
 
     let chars: Vec<char> = line.chars().collect();
 
-    let opponent = Shape::parse(chars[0]);
-    let player = Shape::parse(chars[2]);
 
-    let outcome = Outcome::vs(&opponent, &player);
+    // Phase 1 logic
+//    let opponent = Shape::parse(chars[0]);
+//    let player = Shape::parse(chars[2]);
+
+//    let outcome = Outcome::vs(&opponent, &player);
+//    let score = outcome.score() + player.score();
+
+    // Phase 2 logic
+    let opponent = Shape::parse(chars[0]);
+    let outcome = Outcome::parse(chars[2]);
+    let player = outcome.find_match_shape(opponent);
+
     let score = outcome.score() + player.score();
+
     // debugging
-    println!("{} vs {}:  {}", opponent, player, score);
+    println!("{}:  {}", line, score);
 
     score
 }
@@ -106,6 +116,27 @@ impl Outcome {
            (Shape::Scissors, Shape::Paper) => Outcome::Lose,
            _ => Outcome::Draw
        }
+    }
+
+    fn parse(input: char) -> Outcome {
+        match input {
+            'X' => Outcome::Lose,
+            'Y' => Outcome::Draw,
+            'Z' => Outcome::Win,
+            unrecognized => panic!("Unknown Outcome character:  {}", unrecognized)
+        }
+    }
+
+    fn find_match_shape(&self, opponent: Shape) -> Shape {
+        match (self, opponent) {
+            (Outcome::Win, Shape::Paper) => Shape::Scissors,
+            (Outcome::Win, Shape::Rock) => Shape::Paper,
+            (Outcome::Win, Shape::Scissors) => Shape::Rock,
+            (Outcome::Lose, Shape::Paper) => Shape::Rock,
+            (Outcome::Lose, Shape::Rock) => Shape::Scissors,
+            (Outcome::Lose, Shape::Scissors) => Shape::Paper,
+            (Outcome::Draw, other) => other
+        }
     }
 
     fn score(&self) -> isize {
